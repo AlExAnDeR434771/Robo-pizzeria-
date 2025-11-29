@@ -1,0 +1,240 @@
+<html>
+<head>
+<title>work.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #7a7e85;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+work.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">re</span>
+<span class="s0">import </span><span class="s1">asyncio</span>
+
+<span class="s0">from </span><span class="s1">AD </span><span class="s0">import </span><span class="s1">payment</span>
+
+
+<span class="s2"># определение функции декоратора</span>
+<span class="s0">def </span><span class="s1">choice_visitor</span><span class="s3">(</span><span class="s1">input_func</span><span class="s3">):</span>
+    <span class="s0">def </span><span class="s1">output_func</span><span class="s3">():  </span><span class="s2"># определяем функцию, которая будет выполняться вместо оригинальной</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;*&quot;</span><span class="s3">*</span><span class="s5">48</span><span class="s3">)  </span><span class="s2"># перед выводом оригинальной функции выводим всякую звездочки</span>
+        <span class="s1">input_func</span><span class="s3">()  </span><span class="s2"># вызов оригинальной функции</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;*&quot;</span><span class="s3">*</span><span class="s5">48</span><span class="s3">)  </span><span class="s2"># после вывода оригинальной функции выводим всякую звездочки</span>
+
+    <span class="s0">return </span><span class="s1">output_func  </span><span class="s2"># возвращаем новую функцию</span>
+
+<span class="s2"># создание списков</span>
+<span class="s1">data_visitor </span><span class="s3">= {}</span>
+<span class="s1">order </span><span class="s3">= []</span>
+<span class="s1">total_cost </span><span class="s3">= </span><span class="s5">0</span>
+<span class="s1">menu </span><span class="s3">= {}</span>
+
+<span class="s2">#--1 пользователь вводит свои данные ФИО и возраст--</span>
+
+<span class="s0">while True</span><span class="s3">:</span>
+    <span class="s1">FIO_visitor </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Введите ваше ФИО (Иванов Иван Иванович): &quot;</span><span class="s3">)</span>
+    <span class="s1">standard_FIO </span><span class="s3">= </span><span class="s1">re</span><span class="s3">.</span><span class="s1">compile</span><span class="s3">(</span><span class="s4">r&quot;^[А-Я][а-я]+(?:-[А-Я][а-я]+)*\s+[А-Я,Ё][а-я]&quot;</span>
+                              <span class="s4">r&quot;+(?:-[А-Я][а-я]+)*\s+[А-Я,Ё][а-я]+(?:-[А-Я][а-я]+)*$&quot;</span><span class="s3">)</span>
+    <span class="s0">if </span><span class="s1">standard_FIO</span><span class="s3">.</span><span class="s1">fullmatch</span><span class="s3">(</span><span class="s1">FIO_visitor</span><span class="s3">):</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;ФИО добавленно&quot;</span><span class="s3">)</span>
+        <span class="s1">data_visitor</span><span class="s3">[</span><span class="s4">'ФИО'</span><span class="s3">] = </span><span class="s1">FIO_visitor</span>
+        <span class="s0">break</span>
+    <span class="s0">else</span><span class="s3">:</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;ФИО не верно!&quot;</span><span class="s3">)</span>
+
+<span class="s0">while True</span><span class="s3">:</span>
+    <span class="s0">try</span><span class="s3">:</span>
+        <span class="s1">age_visitor </span><span class="s3">= </span><span class="s1">int</span><span class="s3">(</span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Введите ваш возраст(от 0 до 120): &quot;</span><span class="s3">))</span>
+        <span class="s0">if </span><span class="s5">0 </span><span class="s3">&lt; </span><span class="s1">age_visitor </span><span class="s3">&lt; </span><span class="s5">120</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Возраст добавлен&quot;</span><span class="s3">)</span>
+            <span class="s1">data_visitor</span><span class="s3">[</span><span class="s4">'возраст'</span><span class="s3">] = </span><span class="s1">age_visitor</span>
+            <span class="s0">break</span>
+        <span class="s0">else</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Неправильный возраст!&quot;</span><span class="s3">)</span>
+    <span class="s0">except </span><span class="s1">ValueError</span><span class="s3">:</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Неправильное значение!&quot;</span><span class="s3">)</span>
+
+<span class="s2">#--2 пользователя приветствуют и показывают меню, если пользователь</span>
+<span class="s2"># старше 18 лет то ему показывают взрослое меню с увеличенными порциями--</span>
+
+<span class="s2"># определение оригинальной функции</span>
+<span class="s3">@</span><span class="s1">choice_visitor  </span><span class="s2"># применение декоратора choice_visitor</span>
+<span class="s0">def </span><span class="s1">hello_visitor</span><span class="s3">():</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;*Здравствуйте, </span><span class="s0">{</span><span class="s1">FIO_visitor</span><span class="s0">}</span><span class="s4">!</span><span class="s0">\n</span><span class="s4">&quot;</span>
+          <span class="s4">f&quot;*Добро пожаловать в пиццерию Эль-Аркадио!</span><span class="s0">\n</span><span class="s4">&quot;</span>
+          <span class="s4">f&quot;*Вас приветствует робот-пиццемейкер Эль-Трафимо! &quot;</span><span class="s3">)</span>
+<span class="s2"># вызов оригинальной функции</span>
+<span class="s1">hello_visitor</span><span class="s3">()</span>
+
+<span class="s1">kids_menu</span><span class="s3">={</span><span class="s4">'Пепперони'</span><span class="s3">:{</span><span class="s4">'цена'</span><span class="s3">: </span><span class="s5">400</span><span class="s3">},</span>
+        <span class="s4">'Грибная'</span><span class="s3">:{</span><span class="s4">'цена'</span><span class="s3">: </span><span class="s5">400</span><span class="s3">},</span>
+        <span class="s4">'Четыре сыра'</span><span class="s3">:{</span><span class="s4">'цена'</span><span class="s3">: </span><span class="s5">500</span><span class="s3">}}</span>
+
+<span class="s1">adult_menu </span><span class="s3">= {</span><span class="s4">'Грибная'</span><span class="s3">:{</span><span class="s4">'цена'</span><span class="s3">: </span><span class="s5">640</span><span class="s3">},</span>
+              <span class="s4">'Пепперони'</span><span class="s3">:{</span><span class="s4">'цена'</span><span class="s3">: </span><span class="s5">650</span><span class="s3">},</span>
+              <span class="s4">'Четыре сыра'</span><span class="s3">:{</span><span class="s4">'цена'</span><span class="s3">: </span><span class="s5">700</span><span class="s3">,}}</span>
+
+<span class="s1">drinks </span><span class="s3">= {</span><span class="s4">'вода'</span><span class="s3">: </span><span class="s5">100</span><span class="s3">,</span>
+          <span class="s4">'сок яблочный'</span><span class="s3">: </span><span class="s5">150</span><span class="s3">,</span>
+          <span class="s4">'кола'</span><span class="s3">:</span><span class="s5">235</span><span class="s3">,}</span>
+
+<span class="s1">topping</span><span class="s3">={</span><span class="s4">'99 сыров'</span><span class="s3">: </span><span class="s5">50</span><span class="s3">,</span>
+         <span class="s4">'оливки'</span><span class="s3">: </span><span class="s5">40</span><span class="s3">,</span>
+         <span class="s4">'ананасы'</span><span class="s3">: </span><span class="s5">80</span><span class="s3">}</span>
+
+<span class="s0">while True</span><span class="s3">:</span>
+    <span class="s0">if </span><span class="s1">data_visitor</span><span class="s3">[</span><span class="s4">'возраст'</span><span class="s3">] &lt;= </span><span class="s5">18</span><span class="s3">:</span>
+        <span class="s1">menu </span><span class="s3">= </span><span class="s1">adult_menu</span>
+        
+    <span class="s0">else</span><span class="s3">:</span>
+        <span class="s1">menu </span><span class="s3">= </span><span class="s1">kids_menu</span>
+
+
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;НАШЕ МЕНЮ: </span><span class="s0">\n</span><span class="s4">&quot;</span>
+          <span class="s4">&quot;----------Пиццы-----------&quot;</span><span class="s3">)</span>
+    <span class="s0">for </span><span class="s1">pizza</span><span class="s3">, </span><span class="s1">price </span><span class="s0">in </span><span class="s1">menu</span><span class="s3">.</span><span class="s1">items</span><span class="s3">():</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">pizza</span><span class="s0">} </span><span class="s4">: </span><span class="s0">{</span><span class="s1">price</span><span class="s3">[</span><span class="s4">'цена'</span><span class="s3">]</span><span class="s0">} </span><span class="s4">руб&quot;</span><span class="s3">)</span>
+
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;---------Напитки----------&quot;</span><span class="s3">)</span>
+    <span class="s0">for </span><span class="s1">drink</span><span class="s3">, </span><span class="s1">price </span><span class="s0">in </span><span class="s1">menu</span><span class="s3">.</span><span class="s1">items</span><span class="s3">():</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">drink</span><span class="s0">}</span><span class="s4">: </span><span class="s0">{</span><span class="s1">price</span><span class="s0">} </span><span class="s4">руб&quot;</span><span class="s3">)</span>
+
+
+
+<span class="s2"># --3 Пользователь выбирает готовые варианты пицц, и напитки,</span>
+<span class="s2"># либо выбирает кастомную пиццу с вариантами начинок.--</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">---------ЗАКАЗ---------&quot;</span><span class="s3">)</span>
+
+    <span class="s0">while True</span><span class="s3">:</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;1. Выбрать готовую пиццу</span><span class="s0">\n</span><span class="s4">&quot;</span>
+              <span class="s4">&quot;2. Создать кастомную пиццу</span><span class="s0">\n</span><span class="s4">&quot;</span>
+              <span class="s4">&quot;3. Выбрать напиток</span><span class="s0">\n</span><span class="s4">&quot;</span>
+              <span class="s4">&quot;4. Завершить заказ&quot;</span><span class="s3">)</span>
+
+        <span class="s1">choice </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Что выберите: &quot;</span><span class="s3">)</span>
+
+        <span class="s0">if </span><span class="s1">choice </span><span class="s3">== </span><span class="s4">&quot;4&quot;</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Заказ готовится&quot;</span><span class="s3">)</span>
+            <span class="s0">break</span>
+
+        <span class="s0">elif </span><span class="s1">choice </span><span class="s3">== </span><span class="s4">&quot;1&quot;</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">------ВЫБОР ПИЦЦЫ------&quot;</span><span class="s3">)</span>
+            <span class="s0">for </span><span class="s1">pizza</span><span class="s3">, </span><span class="s1">price </span><span class="s0">in </span><span class="s1">menu</span><span class="s3">.</span><span class="s1">items</span><span class="s3">():</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">pizza</span><span class="s0">} </span><span class="s4">: </span><span class="s0">{</span><span class="s1">price</span><span class="s3">[</span><span class="s4">'цена'</span><span class="s3">]</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+            <span class="s1">user_pizza </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Выберите пиццу: &quot;</span><span class="s3">)</span>
+            <span class="s0">if </span><span class="s1">user_pizza </span><span class="s0">in </span><span class="s1">menu</span><span class="s3">.</span><span class="s1">keys</span><span class="s3">():</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Пицца добавлена&quot;</span><span class="s3">)</span>
+                <span class="s1">total_cost </span><span class="s3">+= </span><span class="s1">menu</span><span class="s3">[</span><span class="s1">user_pizza</span><span class="s3">][</span><span class="s4">'цена'</span><span class="s3">]</span>
+
+            <span class="s0">else</span><span class="s3">:</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Пицца не добавлена!&quot;</span><span class="s3">)</span>
+            <span class="s1">order</span><span class="s3">.</span><span class="s1">append</span><span class="s3">({</span>
+                <span class="s4">&quot;пицца&quot;</span><span class="s3">: </span><span class="s1">user_pizza</span><span class="s3">,</span>
+                <span class="s4">&quot;цена&quot;</span><span class="s3">: </span><span class="s1">menu</span><span class="s3">[</span><span class="s1">user_pizza</span><span class="s3">][</span><span class="s4">'цена'</span><span class="s3">],</span>
+                <span class="s4">&quot;тип&quot;</span><span class="s3">: </span><span class="s4">&quot;пицца&quot;</span>
+            <span class="s3">})</span>
+            <span class="s0">continue</span>
+
+        <span class="s0">elif </span><span class="s1">choice </span><span class="s3">== </span><span class="s4">&quot;2&quot;</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">---------СОЗДАНИЕ КАСТОМНОЙ ПИЦЦЫ---------&quot;</span><span class="s3">)</span>
+            <span class="s1">base_price </span><span class="s3">= </span><span class="s5">400</span>
+            <span class="s1">custom_price </span><span class="s3">= </span><span class="s1">base_price</span>
+            <span class="s1">selected_toppings </span><span class="s3">= []</span>
+            <span class="s0">while True</span><span class="s3">:</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Доступные начинки:&quot;</span><span class="s3">)</span>
+                <span class="s0">for </span><span class="s1">toppin</span><span class="s3">, </span><span class="s1">price </span><span class="s0">in </span><span class="s1">topping</span><span class="s3">.</span><span class="s1">items</span><span class="s3">():</span>
+                    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">toppin</span><span class="s0">}</span><span class="s4">: </span><span class="s0">{</span><span class="s1">price</span><span class="s0">} </span><span class="s4">руб.&quot;</span><span class="s3">)</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">\n</span><span class="s4">Базовая цена пиццы: </span><span class="s0">{</span><span class="s1">base_price</span><span class="s0">} </span><span class="s4">руб.&quot;</span><span class="s3">)</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">\n</span><span class="s4">Текущий состав: </span><span class="s0">{</span><span class="s4">&quot;, &quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">selected_toppings</span><span class="s3">) </span><span class="s0">if </span><span class="s1">selected_toppings </span><span class="s0">else </span><span class="s4">&quot;нет начинок&quot;</span><span class="s0">}\n</span><span class="s4">&quot;</span>
+                      <span class="s4">f&quot;Текущая цена: </span><span class="s0">{</span><span class="s1">custom_price</span><span class="s0">} </span><span class="s4">руб.&quot;</span><span class="s3">)</span>
+
+                <span class="s1">select </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Введите:</span><span class="s0">\n</span><span class="s4">- название начинки чтобы её добавить</span><span class="s0">\n</span><span class="s4">- 'готово' для завершения: &quot;</span><span class="s3">).</span><span class="s1">lower</span><span class="s3">()</span>
+
+                <span class="s0">if </span><span class="s1">select </span><span class="s3">== </span><span class="s4">'готово'</span><span class="s3">:</span>
+                    <span class="s0">if not </span><span class="s1">selected_toppings</span><span class="s3">:</span>
+                        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Вы не добавили ни одной начинки!&quot;</span><span class="s3">)</span>
+                    <span class="s0">break</span>
+                <span class="s0">elif </span><span class="s1">select </span><span class="s0">in </span><span class="s1">topping</span><span class="s3">:</span>
+                    <span class="s0">if </span><span class="s1">select </span><span class="s0">not in </span><span class="s1">selected_toppings</span><span class="s3">:</span>
+                        <span class="s1">selected_toppings</span><span class="s3">.</span><span class="s1">append</span><span class="s3">(</span><span class="s1">select</span><span class="s3">)</span>
+                        <span class="s1">custom_price </span><span class="s3">+= </span><span class="s1">topping</span><span class="s3">[</span><span class="s1">select</span><span class="s3">]</span>
+                        <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Добавили: </span><span class="s0">{</span><span class="s1">select</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+                    <span class="s0">else</span><span class="s3">:</span>
+                        <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Начинка </span><span class="s0">{</span><span class="s1">select</span><span class="s0">} </span><span class="s4">уже добавлена&quot;</span><span class="s3">)</span>
+                <span class="s0">else</span><span class="s3">:</span>
+                    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Неизвестная команда или начинка&quot;</span><span class="s3">)</span>
+
+            <span class="s1">name_pizza </span><span class="s3">= </span><span class="s4">&quot;Кастомная пицца&quot;</span>
+            <span class="s0">if </span><span class="s1">selected_toppings</span><span class="s3">:</span>
+                 <span class="s1">name_pizza </span><span class="s3">+= </span><span class="s4">f&quot; (</span><span class="s0">{</span><span class="s4">&quot;, &quot;</span><span class="s3">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">selected_toppings</span><span class="s3">)</span><span class="s0">}</span><span class="s4">)&quot;</span><span class="s2">#оператор SQL</span>
+
+            <span class="s1">order</span><span class="s3">.</span><span class="s1">append</span><span class="s3">({</span><span class="s4">&quot;название&quot;</span><span class="s3">: </span><span class="s1">name_pizza</span><span class="s3">,</span>
+                          <span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">цена&quot;</span><span class="s3">: </span><span class="s1">custom_price</span><span class="s3">,</span>
+                          <span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">тип&quot;</span><span class="s3">: </span><span class="s4">&quot;пицца&quot;</span><span class="s3">})</span>
+            <span class="s1">total_cost </span><span class="s3">+= </span><span class="s1">custom_price</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">\n</span><span class="s4">Кастомная пицца добавлена в заказ&quot;</span><span class="s3">)</span>
+            <span class="s0">continue</span>
+
+        <span class="s0">elif </span><span class="s1">choice </span><span class="s3">== </span><span class="s4">&quot;3&quot;</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">---------Напитки----------&quot;</span><span class="s3">)</span>
+            <span class="s0">for </span><span class="s1">drink</span><span class="s3">, </span><span class="s1">price </span><span class="s0">in </span><span class="s1">menu</span><span class="s3">.</span><span class="s1">items</span><span class="s3">():</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">drink</span><span class="s0">} </span><span class="s4">: </span><span class="s0">{</span><span class="s1">price</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">---------Напитки----------&quot;</span><span class="s3">)</span>
+            <span class="s1">drink_choice </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Выберите напиток: </span><span class="s0">\n</span><span class="s4">&quot;</span><span class="s3">)</span>
+            <span class="s0">if </span><span class="s1">drink_choice </span><span class="s0">in </span><span class="s1">menu</span><span class="s3">:</span>
+                    <span class="s1">total_cost </span><span class="s3">+= </span><span class="s1">menu</span><span class="s3">[</span><span class="s1">drink_choice</span><span class="s3">]</span>
+                    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Ваш напиток добавлен&quot;</span><span class="s3">)</span>
+                    <span class="s1">order</span><span class="s3">.</span><span class="s1">append</span><span class="s3">({</span><span class="s4">&quot;название&quot;</span><span class="s3">: </span><span class="s1">drink_choice</span><span class="s3">,</span>
+                        <span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">цена&quot;</span><span class="s3">: </span><span class="s1">menu</span><span class="s3">[</span><span class="s1">drink_choice</span><span class="s3">],</span>
+                        <span class="s4">&quot;</span><span class="s0">\n</span><span class="s4">тип&quot;</span><span class="s3">: </span><span class="s4">&quot;напитки&quot;</span><span class="s3">})</span>
+
+            <span class="s0">else</span><span class="s3">:</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Напиток не добавлен!&quot;</span><span class="s3">)</span>
+
+        <span class="s0">else</span><span class="s3">:</span>
+            <span class="s0">if not </span><span class="s1">order</span><span class="s3">:</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Ваш заказ пуст!&quot;</span><span class="s3">)</span>
+            <span class="s0">else</span><span class="s3">:</span>
+                <span class="s0">break</span>
+                <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Неверный выбор!&quot;</span><span class="s3">)</span>
+
+
+<span class="s2"># --4 Пользователю выдается чек с перечислением всех позиций и итоговой суммой--</span>
+<span class="s3">@</span><span class="s1">choice_visitor</span>
+<span class="s0">def </span><span class="s1">chek</span><span class="s3">():</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;--------ВАШ ЧЕК--------&quot;</span><span class="s3">)</span>
+<span class="s0">for </span><span class="s1">i</span><span class="s3">, </span><span class="s1">item </span><span class="s0">in </span><span class="s1">enumerate</span><span class="s3">(</span><span class="s1">order</span><span class="s3">, </span><span class="s5">1</span><span class="s3">):</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;</span><span class="s0">{</span><span class="s1">i</span><span class="s0">}</span><span class="s4">. </span><span class="s0">{</span><span class="s1">item</span><span class="s3">[</span><span class="s4">&quot;название&quot;</span><span class="s3">]</span><span class="s0">}</span><span class="s4">: </span><span class="s0">{</span><span class="s1">item</span><span class="s3">[</span><span class="s4">'цена'</span><span class="s3">]</span><span class="s0">} </span><span class="s4">руб.&quot;</span><span class="s3">)</span>
+
+<span class="s2"># --5 Пользователь выбирает оплатуоплата картой (в этом случае сдача не выдаётся)</span>
+<span class="s2"># или наличкой(рассчитать сдачу)--</span>
+<span class="s3">@</span><span class="s1">choice_visitor</span>
+<span class="s0">def </span><span class="s1">payment</span><span class="s3">():</span>
+    <span class="s0">while True</span><span class="s3">:</span>
+        <span class="s1">your_balance </span><span class="s3">= </span><span class="s1">int</span><span class="s3">(</span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Введите сколько у вас  денег : &quot;</span><span class="s3">))</span>
+        <span class="s0">if </span><span class="s1">your_balance </span><span class="s3">&lt; </span><span class="s5">100</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Маловато для пиццерии!&quot;</span><span class="s3">)</span>
+        <span class="s1">choice_payment </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Выберите способ оплаты - </span><span class="s0">\n</span><span class="s4">&quot;</span>
+                           <span class="s4">f&quot;1. Картой </span><span class="s0">\n</span><span class="s4">&quot;</span>
+                           <span class="s4">f&quot;2. Наличкой </span><span class="s0">\n</span><span class="s4">: &quot;</span><span class="s3">)</span>
+        <span class="s0">while </span><span class="s1">choice_payment </span><span class="s3">!= </span><span class="s4">&quot;1&quot; </span><span class="s0">or </span><span class="s1">choice_payment </span><span class="s3">!= </span><span class="s4">&quot;2&quot;</span><span class="s3">:</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Такого способа оплаты нет...&quot;</span><span class="s3">)</span>
+        <span class="s1">choice_payment </span><span class="s3">= </span><span class="s1">input</span><span class="s3">(</span><span class="s4">&quot;Выберите способ оплаты - </span><span class="s0">\n</span><span class="s4">&quot;</span>
+                               <span class="s4">f&quot;1. Картой </span><span class="s0">\n</span><span class="s4">&quot;</span>
+                               <span class="s4">f&quot;2. Наличкой </span><span class="s0">\n</span><span class="s4">: &quot;</span><span class="s3">)</span>
+
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">f&quot;Сдача: </span><span class="s0">{</span><span class="s1">your_balance </span><span class="s3">- </span><span class="s0">}</span><span class="s4">&quot;</span><span class="s3">)</span>
+<span class="s1">payment</span><span class="s3">()</span>
+
+<span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Досвидания хорошего вам дня!&quot;</span><span class="s3">)</span></pre>
+</body>
+</html>
